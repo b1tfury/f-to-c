@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#05030a" />
-  <title>Glow</title>
+  <title>the two of you</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="shell">
+  <div class="shell" id="shell">
     <header class="top">
-      <p class="eyebrow">For the two of you</p>
-      <label for="c">Celsius</label>
-      <input id="c" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="37.6" />
+      <p class="eyebrow">the two of you</p>
+      <p class="hint" id="hint">slide · 0.1° at a time</p>
     </header>
 
     <section class="viz" aria-live="polite">
       <div class="orb" id="orb">
         <svg viewBox="0 0 220 220" class="ring">
           <circle class="track" cx="110" cy="110" r="92" />
+          <circle class="ghost" id="ghost" cx="110" cy="110" r="92" />
           <circle class="arc" id="arc" cx="110" cy="110" r="92" />
         </svg>
         <div class="core">
@@ -29,10 +29,19 @@
       </div>
     </section>
 
-    <footer class="status" id="status">
-      <h1 id="title">Type a temp</h1>
-      <p id="line">Celsius in. Fahrenheit and a read on how you feel.</p>
+    <footer class="status">
+      <h1 id="title">Mild fever</h1>
+      <p id="line">Rest and water. Watch it.</p>
     </footer>
+
+    <aside class="rail" aria-hidden="true">
+      <span class="tick t41">41</span>
+      <span class="tick t39">39</span>
+      <span class="tick t37">37</span>
+      <span class="tick t35">35</span>
+      <div class="fill" id="fill"></div>
+      <div class="thumb" id="thumb"></div>
+    </aside>
   </div>
   <script src="./app.js"></script>
 </body>
