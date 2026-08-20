@@ -1,20 +1,24 @@
-const shell = document.querySelector(".shell");
-const cEl = document.getElementById("c");
+const MIN = 34;
+const MAX = 42;
+const STEP = 0.1;
+const PX_PER_TENTH = 16;
+const CIRC = 2 * Math.PI * 92;
+
+const shell = document.getElementById("shell");
 const cOut = document.getElementById("cOut");
 const fOut = document.getElementById("fOut");
 const arc = document.getElementById("arc");
-const CIRC = 2 * Math.PI * 92;
+const ghost = document.getElementById("ghost");
+const fill = document.getElementById("fill");
+const thumb = document.getElementById("thumb");
+const hint = document.getElementById("hint");
 
 const toF = (c) => Number(c) * 9 / 5 + 32;
-const round1 = (n) => Math.round(n * 10) / 10;
+const round1 = (n) => Math.round(n / STEP) * STEP;
+const clamp = (n) => Math.min(MAX, Math.max(MIN, n));
 function fmt(n) {
   const r = round1(n);
   return Number.isInteger(r) ? String(r) : r.toFixed(1);
-}
-function isDraft(raw) {
-  const s = String(raw).trim();
-  if (!s || s === "-" || s === "." || s === "-.") return true;
-  return s.charAt(s.length - 1) === ".";
 }
 function band(c) {
   if (c < 35) return { id: "low", title: "Too low", line: "Warm up. If it stays there, get help." };
@@ -25,14 +29,17 @@ function band(c) {
   if (c <= 40.0) return { id: "high", title: "High fever", line: "Take medicine. Keep checking." };
   return { id: "high", title: "Very high", line: "Seek care now." };
 }
-function fitKeyboard() {
-  const vv = window.visualViewport;
-  const h = vv ? vv.height : window.innerHeight;
-  document.documentElement.style.setProperty("--vvh", Math.round(h) + "px");
+function offsetFor(c) {
+  const pct = Math.min(1, Math.max(0, (c - 35) / 6));
+  return CIRC * (1 - pct);
 }
-function paint(c) {
+function railPct(c) {
+  return ((c - MIN) / (MAX - MIN)) * 100;
+}
+function paint(c, dir) {
   const b = band(c);
   shell.dataset.band = b.id;
+  shell.dataset.dir = dir || "idle";
   cOut.textContent = fmt(c) + "\u00b0C";
   fOut.textContent = fmt(toF(c)) + "\u00b0F";
   const t = document.getElementById("title");
@@ -44,30 +51,72 @@ function paint(c) {
     t.replaceWith(next);
   }
   arc.style.strokeDasharray = String(CIRC);
-  const pct = Math.min(1, Math.max(0, (c - 35) / 6));
-  arc.style.strokeDashoffset = String(CIRC * (1 - pct));
+  arc.style.strokeDashoffset = String(offsetFor(c));
+  fill.style.height = railPct(c) + "%";
+  thumb.style.bottom = railPct(c) + "%";
 }
-function fromC(raw, writeBack) {
-  if (isDraft(raw)) return;
-  const n = Number(raw);
-  if (!Number.isFinite(n)) return;
-  if (writeBack) cEl.value = String(raw);
+
+let temp = 37.6;
+let startTemp = 37.6;
+let startY = 0;
+let dragging = false;
+let idleTimer = 0;
+
+function setTemp(n, dir) {
+  const next = round1(clamp(n));
+  if (next !== temp && navigator.vibrate) navigator.vibrate(8);
+  temp = next;
   const url = new URL(location.href);
   url.search = "";
-  url.searchParams.set("c", raw);
+  url.searchParams.set("c", fmt(temp));
   history.replaceState(null, "", url);
-  paint(n);
+  paint(temp, dir);
 }
 
-fitKeyboard();
-if (window.visualViewport) {
-  visualViewport.addEventListener("resize", fitKeyboard);
-  visualViewport.addEventListener("scroll", fitKeyboard);
+function dirFrom(from, to) {
+  if (to > from) return "rising";
+  if (to < from) return "falling";
+  return "idle";
 }
-window.addEventListener("resize", fitKeyboard);
-cEl.addEventListener("input", function () { fromC(cEl.value, false); });
-cEl.addEventListener("focus", function () { setTimeout(fitKeyboard, 80); });
 
-const start = new URLSearchParams(location.search).get("c") || "37.6";
-fromC(start, true);
-cEl.value = start;
+function onDown(y, id) {
+  dragging = true;
+  startY = y;
+  startTemp = temp;
+  ghost.style.strokeDasharray = String(CIRC);
+  ghost.style.strokeDashoffset = String(offsetFor(startTemp));
+  hint.textContent = "from " + fmt(startTemp) + "\u00b0";
+  paint(temp, "idle");
+  try { shell.setPointerCapture(id); } catch (e) {}
+}
+function onMove(y) {
+  if (!dragging) return;
+  const tenths = (startY - y) / PX_PER_TENTH;
+  const next = startTemp + tenths * STEP;
+  setTemp(next, dirFrom(startTemp, next));
+}
+function onUp() {
+  if (!dragging) return;
+  dragging = false;
+  hint.textContent = "slide · 0.1° at a time";
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(function () { paint(temp, "idle"); }, 700);
+}
+
+shell.addEventListener("pointerdown", function (e) {
+  e.preventDefault();
+  onDown(e.clientY, e.pointerId);
+});
+shell.addEventListener("pointermove", function (e) {
+  onMove(e.clientY);
+});
+shell.addEventListener("pointerup", onUp);
+shell.addEventListener("pointercancel", onUp);
+
+window.addEventListener("keydown", function (e) {
+  if (e.key === "ArrowUp") { e.preventDefault(); setTemp(temp + STEP, "rising"); }
+  if (e.key === "ArrowDown") { e.preventDefault(); setTemp(temp - STEP, "falling"); }
+});
+
+const start = Number(new URLSearchParams(location.search).get("c")) || 37.6;
+setTemp(start, "idle");
