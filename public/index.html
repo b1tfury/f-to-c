@@ -2,36 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#05060d" />
-  <title>Celsius and Fahrenheit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#05030a" />
+  <title>Glow</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="wrap">
-    <main class="card">
-      <h1>TEMP GLOW</h1>
-      <p class="sub">Celsius on top. Type 37.6. It stays.</p>
-      <div class="stage">
-        <div class="tube" aria-hidden="true">
-          <div class="mercury" id="mercury"></div>
-          <div class="bulb"></div>
-        </div>
-        <div class="read">
+  <div class="shell">
+    <header class="top">
+      <p class="eyebrow">For the two of you</p>
+      <label for="c">Celsius</label>
+      <input id="c" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="37.6" />
+    </header>
+
+    <section class="viz" aria-live="polite">
+      <div class="orb" id="orb">
+        <svg viewBox="0 0 220 220" class="ring">
+          <circle class="track" cx="110" cy="110" r="92" />
+          <circle class="arc" id="arc" cx="110" cy="110" r="92" />
+        </svg>
+        <div class="core">
           <div class="c" id="cOut">—</div>
           <div class="f" id="fOut">—</div>
         </div>
       </div>
-      <div class="field">
-        <label for="c">Celsius</label>
-        <input id="c" type="text" inputmode="decimal" autocomplete="off" placeholder="37.6" />
-      </div>
-      <div class="field">
-        <label for="f">Fahrenheit</label>
-        <input id="f" type="text" inputmode="decimal" autocomplete="off" placeholder="99.7" />
-      </div>
-      <div class="err" id="err"></div>
-    </main>
+    </section>
+
+    <footer class="status" id="status">
+      <h1 id="title">Type a temp</h1>
+      <p id="line">Celsius in. Fahrenheit and a read on how you feel.</p>
+    </footer>
   </div>
   <script src="./app.js"></script>
 </body>
