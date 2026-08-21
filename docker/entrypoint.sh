@@ -18,7 +18,8 @@ if [ -z "${DATABASE_URL:-}" ] && [ -z "${DB_PASSWORD:-}" ]; then
   touch "$DB_DATABASE" || true
 fi
 
-mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+php artisan storage:link --force
 
 php artisan migrate --force --no-interaction
 
