@@ -4,45 +4,298 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#05030a" />
-  <title>the two of you</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#07080a" />
+  <title>Pipe vs stock</title>
+  <style>
+    :root {
+      --bg: #07080a;
+      --ink: #f4f1ea;
+      --mute: #8a857c;
+      --stock: #c8f07d;
+      --fx: #7ec8ff;
+      --track: #181a1f;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      overscroll-behavior: none;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .page {
+      height: 100dvh;
+      height: 100svh;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: max(14px, env(safe-area-inset-top)) 22px max(16px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .eyebrow {
+      margin: 0;
+      font-size: .72rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--mute);
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+    h1.long { font-size: 1.05rem; }
+    h1[data-win="fx"] { color: var(--fx); }
+    h1[data-win="stock"] { color: var(--stock); }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-height: 0;
+    }
+    .hero .big {
+      font-size: clamp(2.6rem, 14vw, 3.6rem);
+      font-weight: 650;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .hero .label {
+      margin-top: 6px;
+      font-size: .72rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--mute);
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .row .n { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.03em; }
+    .row .k { font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
+    .row.stock .n { color: var(--stock); }
+    .row.fx .n { color: var(--fx); }
+    .sliders {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .ctl {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      align-items: center;
+    }
+    .ctl label {
+      font-size: .78rem;
+      color: var(--mute);
+      letter-spacing: .04em;
+    }
+    .ctl .val {
+      font-size: .95rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .ctl.stock .val { color: var(--stock); }
+    .ctl.fx .val { color: var(--fx); }
+    input[type="range"] {
+      grid-column: 1 / -1;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 36px;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]:focus { outline: none; }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 10px;
+      border-radius: 99px;
+      background: linear-gradient(to right, var(--fillc, var(--ink)) 0, var(--fillc, var(--ink)) var(--fill, 0%), var(--track) var(--fill, 0%), var(--track) 100%);
+    }
+    input[type="range"]::-moz-range-track {
+      height: 10px;
+      border-radius: 99px;
+      background: var(--track);
+    }
+    input[type="range"]::-moz-range-progress {
+      height: 10px;
+      border-radius: 99px;
+      background: var(--fillc, var(--ink));
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      margin-top: -9px;
+      border-radius: 50%;
+      background: var(--fillc, var(--ink));
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--fillc, var(--ink)) 35%, transparent);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--fillc, var(--ink));
+      border: 2px solid var(--bg);
+    }
+    .ctl.stock input { --fillc: var(--stock); }
+    .ctl.fx input { --fillc: var(--fx); }
+    footer {
+      font-size: .72rem;
+      line-height: 1.45;
+      color: var(--mute);
+    }
+  </style>
 </head>
 <body>
-  <div class="shell" id="shell">
-    <header class="top">
-      <p class="eyebrow">the two of you</p>
-      <p class="hint" id="hint">slide · 0.1° at a time</p>
-    </header>
+  <div class="page">
+    <p class="eyebrow">Pipe vs stock</p>
+    <h1 id="headline">FX is the business.</h1>
 
-    <section class="viz" aria-live="polite">
-      <div class="orb" id="orb">
-        <svg viewBox="0 0 220 220" class="ring">
-          <circle class="track" cx="110" cy="110" r="92" />
-          <circle class="ghost" id="ghost" cx="110" cy="110" r="92" />
-          <circle class="arc" id="arc" cx="110" cy="110" r="92" />
-        </svg>
-        <div class="core">
-          <div class="c" id="cOut">—</div>
-          <div class="f" id="fOut">—</div>
-        </div>
+    <div class="hero">
+      <div class="big" id="pipeOut">$26k</div>
+      <div class="label">Monthly processor revenue</div>
+    </div>
+
+    <div class="row stock">
+      <span class="n" id="stockOut">$8k</span>
+      <span class="k">Stock</span>
+    </div>
+    <div class="row fx">
+      <span class="n" id="fxOut">$44k</span>
+      <span class="k">FX</span>
+    </div>
+
+    <div class="sliders">
+      <div class="ctl">
+        <label for="tpv">Monthly TPV</label>
+        <span class="val" id="tpvVal">$22M</span>
+        <input id="tpv" type="range" min="1" max="80" step="1" value="22" />
       </div>
-    </section>
+      <div class="ctl">
+        <label for="bps">Take-rate</label>
+        <span class="val" id="bpsVal">12 bps</span>
+        <input id="bps" type="range" min="5" max="80" step="1" value="12" />
+      </div>
+      <div class="ctl stock">
+        <label for="aum">AUM</label>
+        <span class="val" id="aumVal">$250M</span>
+        <input id="aum" type="range" min="5" max="200" step="1" value="25" />
+      </div>
+      <div class="ctl fx">
+        <label for="fxShare">FX share</label>
+        <span class="val" id="fxVal">40%</span>
+        <input id="fxShare" type="range" min="0" max="100" step="1" value="40" />
+      </div>
+    </div>
 
-    <footer class="status">
-      <h1 id="title">Mild fever</h1>
-      <p id="line">Rest and water. Watch it.</p>
+    <footer>
+      Allfunds taxes AuA at ~3.9 bps, not the wire. Marqeta: TPV can rip while take-rate dies. FX spread here is 50 bps.
     </footer>
-
-    <aside class="rail" aria-hidden="true">
-      <span class="tick t41">41</span>
-      <span class="tick t39">39</span>
-      <span class="tick t37">37</span>
-      <span class="tick t35">35</span>
-      <div class="fill" id="fill"></div>
-      <div class="thumb" id="thumb"></div>
-    </aside>
   </div>
-  <script src="./app.js"></script>
+  <script>
+    const BPS = 0.0001;
+    const STOCK_BPS = 3.9;
+    const FX_BPS = 50;
+    const tpvEl = document.getElementById("tpv");
+    const bpsEl = document.getElementById("bps");
+    const aumEl = document.getElementById("aum");
+    const fxEl = document.getElementById("fxShare");
+    const headline = document.getElementById("headline");
+
+    function compact(n) {
+      const abs = Math.abs(n);
+      const sign = n < 0 ? "-" : "";
+      const trim = (v, d) => {
+        const s = v.toFixed(d);
+        return s.replace(/\.0$/, "");
+      };
+      if (abs >= 1e9) {
+        const v = abs / 1e9;
+        return sign + "$" + trim(v, v >= 10 ? 0 : 1) + "B";
+      }
+      if (abs >= 1e6) {
+        const v = abs / 1e6;
+        return sign + "$" + trim(v, v >= 100 || Number.isInteger(v) ? 0 : 1) + "M";
+      }
+      if (abs >= 1e3) {
+        return sign + "$" + Math.round(abs / 1e3) + "k";
+      }
+      return sign + "$" + Math.round(abs);
+    }
+
+    function fill(el) {
+      const min = +el.min;
+      const max = +el.max;
+      const val = +el.value;
+      el.style.setProperty("--fill", ((val - min) / (max - min)) * 100 + "%");
+    }
+
+    function paint() {
+      const tpv = +tpvEl.value * 1e6;
+      const bps = +bpsEl.value;
+      const aum = +aumEl.value * 10e6;
+      const share = +fxEl.value / 100;
+
+      const pipe = tpv * bps * BPS;
+      const stock = aum * STOCK_BPS * BPS / 12;
+      const fx = tpv * share * FX_BPS * BPS;
+
+      document.getElementById("tpvVal").textContent = compact(tpv);
+      document.getElementById("bpsVal").textContent = bps + " bps";
+      document.getElementById("aumVal").textContent = compact(aum);
+      document.getElementById("fxVal").textContent = fxEl.value + "%";
+      document.getElementById("pipeOut").textContent = compact(pipe);
+      document.getElementById("stockOut").textContent = compact(stock);
+      document.getElementById("fxOut").textContent = compact(fx);
+
+      fill(tpvEl);
+      fill(bpsEl);
+      fill(aumEl);
+      fill(fxEl);
+
+      let win = "pipe";
+      let text;
+      if (fx >= pipe && fx >= stock) {
+        win = "fx";
+        text = "FX is the business.";
+      } else if (stock >= pipe) {
+        win = "stock";
+        text = "The stock already beats the pipe.";
+      } else {
+        const pct = stock > 0 ? Math.round((pipe / stock) * 100) : 0;
+        const need = pipe * 12 / (STOCK_BPS * BPS);
+        text = "The pipe is " + pct + "% of the stock. You need " + compact(need) + " AUM for Allfunds math to match this ticket.";
+      }
+      headline.textContent = text;
+      headline.dataset.win = win;
+      headline.classList.toggle("long", win === "pipe");
+    }
+
+    [tpvEl, bpsEl, aumEl, fxEl].forEach((el) => {
+      el.addEventListener("input", paint);
+    });
+    paint();
+  </script>
 </body>
 </html>
