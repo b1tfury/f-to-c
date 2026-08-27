@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: pipe-vs-stock
+    runtime: static
+    branch: pipe-vs-stock
+    buildCommand: echo ok
+    staticPublishPath: public

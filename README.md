@@ -1,2 +1,1 @@
-# f-to-c
-Fahrenheit to Celsius converter. Pass ?f= as the night temperature.
+Pipe vs stock phone slider: monthly TPV, processor take-rate, AUM, and FX share, compared against Allfunds AuA tax and a 50 bps FX spread. Deploy the `public/` directory on Render as a static site from this branch (do not merge to main).
